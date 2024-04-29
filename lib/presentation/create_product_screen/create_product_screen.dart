@@ -1,5 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 import '../../core/app_export.dart';
 import '../../widgets/app_bar/appbar_leading_iconbutton.dart';
 import '../../widgets/app_bar/appbar_title.dart';
@@ -8,27 +12,25 @@ import '../../widgets/app_bar/custom_app_bar.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
 
-
 // ignore_for_file: must_be_immutable
-class CreateProductScreen extends StatelessWidget {
-  CreateProductScreen({Key? key})
-      : super(
-          key: key,
-        );
 
+class CreateProductScreen extends StatefulWidget {
+  CreateProductScreen({Key? key}) : super(key: key);
+
+  @override
+  _CreateProductScreenState createState() => _CreateProductScreenState();
+}
+
+class _CreateProductScreenState extends State<CreateProductScreen> {
   TextEditingController productquantityController = TextEditingController();
-
   TextEditingController basepriceoneController = TextEditingController();
-
   TextEditingController sellingpriceController = TextEditingController();
-
   TextEditingController modelplaceholdeController = TextEditingController();
-
   TextEditingController coloroneController = TextEditingController();
-
   TextEditingController productquantity1Controller = TextEditingController();
-
   TextEditingController commentoneController = TextEditingController();
+
+  XFile? _imageFile;
 
   @override
   Widget build(BuildContext context) {
@@ -38,31 +40,31 @@ class CreateProductScreen extends StatelessWidget {
         appBar: _buildAppBar(context),
         body: Container(
           width: double.maxFinite,
-          padding: EdgeInsets.symmetric(vertical: 26.v),
+          padding: EdgeInsets.symmetric(vertical: 26),
           child: Column(
             children: [
-              SizedBox(height: 26.v),
+              SizedBox(height: 26),
               Expanded(
                 child: SingleChildScrollView(
                   child: Container(
-                    margin: EdgeInsets.only(bottom: 5.v),
-                    padding: EdgeInsets.symmetric(horizontal: 20.h),
+                    margin: EdgeInsets.only(bottom: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       children: [
                         _buildColumnUploadIcon(context),
-                        SizedBox(height: 12.v),
+                        SizedBox(height: 12),
                         _buildInputField1(context),
-                        SizedBox(height: 12.v),
+                        SizedBox(height: 12),
                         _buildInputField2(context),
-                        SizedBox(height: 12.v),
+                        SizedBox(height: 12),
                         _buildInputField3(context),
-                        SizedBox(height: 12.v),
+                        SizedBox(height: 12),
                         _buildInputField4(context),
-                        SizedBox(height: 13.v),
+                        SizedBox(height: 13),
                         _buildInputField5(context),
-                        SizedBox(height: 12.v),
+                        SizedBox(height: 12),
                         _buildInputField6(context),
-                        SizedBox(height: 12.v),
+                        SizedBox(height: 12),
                         _buildInputField7(context)
                       ],
                     ),
@@ -74,6 +76,35 @@ class CreateProductScreen extends StatelessWidget {
         ),
         bottomNavigationBar: _buildQoShish(context),
       ),
+    );
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedImage =
+        await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        _imageFile = pickedImage;
+      });
+    }
+  }
+
+  Widget _buildSelectedImageWidget() {
+    return _imageFile == null
+        ? Placeholder()
+        : Image.file(
+            File(_imageFile!.path),
+            width: 200,
+            height: 200,
+            fit: BoxFit.cover,
+          );
+  }
+
+  Widget _buildImageSelectionButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: _pickImage,
+      child: Text("Select Image from Gallery"),
     );
   }
 
@@ -134,6 +165,8 @@ class CreateProductScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            _buildSelectedImageWidget(),
+            _buildImageSelectionButton(context),
             CustomImageView(
               imagePath: ImageConstant.imgUploadIcon,
               height: 59.v,
