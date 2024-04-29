@@ -57,7 +57,7 @@ class StatisticContainerScreen extends StatelessWidget {
       case AppRoutes.statisticPage:
         return StatisticPage();
       default:
-        return DefaultWidget();
+        return StatisticPage();
     }
   }
 }

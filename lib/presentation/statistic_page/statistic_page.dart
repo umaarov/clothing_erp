@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_charts/flutter_charts.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as fs;
+
 import '../../core/app_export.dart';
-import '../../theme/custom_button_style.dart';
 import '../../widgets/app_bar/appbar_leading_iconbutton.dart';
 import '../../widgets/app_bar/appbar_title.dart';
 import '../../widgets/app_bar/appbar_trailing_iconbutton.dart';
 import '../../widgets/app_bar/custom_app_bar.dart';
-import '../../widgets/custom_elevated_button.dart';
-import '../../widgets/custom_icon_button.dart'; // ignore_for_file: must_be_immutable
+import '../../widgets/custom_icon_button.dart';
 
 class StatisticPage extends StatelessWidget {
   const StatisticPage({Key? key})
       : super(
-    key: key,
-  );
+          key: key,
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -49,45 +49,53 @@ class StatisticPage extends StatelessWidget {
               SizedBox(height: 12.v),
               _buildRowOylik(context),
               SizedBox(height: 15.v),
-              SizedBox(
-                height: 44.v,
-                width: 95.h,
-                child: Stack(
-                  alignment: Alignment.topLeft,
-                  children: [
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        height: 35.v,
-                        width: 78.h,
-                        decoration: BoxDecoration(
-                          color: appTheme.blueA200.withOpacity(0.4),
-                          borderRadius: BorderRadius.circular(
-                            8.h,
-                          ),
-                        ),
-                      ),
-                    ),
-                    CustomElevatedButton(
-                      height: 40.v,
-                      width: 85.h,
-                      text: "120",
-                      buttonStyle: CustomButtonStyles.fillBlueA,
-                      buttonTextStyle:
-                      CustomTextStyles.titleSmallOnErrorContainer,
-                      alignment: Alignment.topLeft,
-                    )
-                  ],
-                ),
-              ),
-              _buildColumn(context),
-              SizedBox(height: 19.v),
-              _buildRowYan(context)
+              Container(
+                  height: 300,
+                  width: double.infinity,
+                  padding: EdgeInsets.all(8.0),
+                  child: chartToRun()),
+              // _buildColumn(context),
+              // SizedBox(height: 19.v),
+              // // _buildRowYan(context)
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget chartToRun() {
+    LabelLayoutStrategy? xContainerLabelLayoutStrategy;
+    ChartData chartData;
+    ChartOptions chartOptions = const ChartOptions();
+    // Example shows a mix of positive and negative data values.
+    chartData = ChartData(
+      dataRows: const [
+        [2000.0, 1800.0, 2200.0, 2300.0, 1700.0, 1800.0],
+        [1100.0, 1000.0, 1200.0, 800.0, 700.0, 800.0],
+        [0.0, 100.0, -200.0, 150.0, -100.0, -150.0],
+        [-800.0, -400.0, -300.0, -400.0, -200.0, -250.0],
+      ],
+      xUserLabels: const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      dataRowsLegends: const [
+        'Big Corp',
+        'Medium Corp',
+        'Print Shop',
+        'Bar',
+      ],
+      chartOptions: chartOptions,
+    );
+    var lineChartContainer = LineChartTopContainer(
+      chartData: chartData,
+      xContainerLabelLayoutStrategy: xContainerLabelLayoutStrategy,
+    );
+
+    var lineChart = LineChart(
+      painter: LineChartPainter(
+        lineChartContainer: lineChartContainer,
+      ),
+    );
+    return lineChart;
   }
 
   /// Section Widget
@@ -213,6 +221,7 @@ class StatisticPage extends StatelessWidget {
       ),
     );
   }
+
   /// Section Widget
   Widget _buildColumn(BuildContext context) {
     return Container(
@@ -263,7 +272,7 @@ class StatisticPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          SizedBox(width: 5.0), // Adjust the initial padding
+          SizedBox(width: 5.0),
           for (final month in [
             "YAN",
             "FEV",
@@ -290,9 +299,9 @@ class StatisticPage extends StatelessWidget {
     );
   }
 
-
   /// Common widget
-  Widget _buildOutcome(BuildContext context, {
+  Widget _buildOutcome(
+    BuildContext context, {
     required String floatingIcon,
     required String priceText,
     required String typeText,
@@ -358,8 +367,4 @@ class StatisticPage extends StatelessWidget {
       print('Selected date: $pickedDate');
     }
   }
-
-
 }
-
-

@@ -34,6 +34,8 @@ class CustomBottomBarState extends State<CustomBottomBar> {
     )
   ];
 
+  // Inside CustomBottomBarState class
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -51,70 +53,62 @@ class CustomBottomBarState extends State<CustomBottomBar> {
         type: BottomNavigationBarType.fixed,
         items: List.generate(bottomMenuList.length, (index) {
           return BottomNavigationBarItem(
-            icon: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CustomImageView(
-                  imagePath: bottomMenuList[index].icon,
-                  height: 24.adaptSize,
-                  width: 24.adaptSize,
-                  color: theme.colorScheme.onSecondaryContainer,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 2.v),
-                  child: Text(
-                    bottomMenuList[index].title ?? "",
-                    style: theme.textTheme.labelLarge!.copyWith(
-                      color: theme.colorScheme.onSecondaryContainer,
-                    ),
-                  ),
-                )
-              ],
-            ),
-            activeIcon: Container(
-              decoration: AppDecoration.fillGray.copyWith(
-                borderRadius: BorderRadiusStyle.circleBorder24,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomImageView(
-                    imagePath: bottomMenuList[index].activeIcon,
-                    height: 24.adaptSize,
-                    width: 24.adaptSize,
-                    color: theme.colorScheme.onPrimaryContainer,
-                    margin: EdgeInsets.only(top: 2.v),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: 1.v,
-                      bottom: 5.v,
-                    ),
-                    child: Text(
-                      bottomMenuList[index].title ?? "",
-                      style: CustomTextStyles.labelLargeOnPrimaryContainer
-                          .copyWith(
-                        color: theme.colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+            icon: buildBottomBarItem(index),
+            activeIcon: buildBottomBarItem(index, isActive: true),
             label: '',
           );
         }),
         onTap: (index) {
-          selectedIndex = index;
+          setState(() {
+            selectedIndex = index;
+          });
           widget.onChanged?.call(bottomMenuList[index].type);
-          setState(() {});
         },
       ),
     );
   }
+
+  Widget buildBottomBarItem(int index, {bool isActive = false}) {
+    final item = bottomMenuList[index];
+    final iconColor = isActive
+        ? theme.colorScheme.onSecondaryContainer
+        : theme.colorScheme.onPrimaryContainer;
+    final containerColor = isActive ? Colors.black : appTheme.gray50;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (!isActive) {
+            selectedIndex = index;
+          }
+        });
+        widget.onChanged?.call(bottomMenuList[index].type);
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CustomImageView(
+            imagePath: isActive ? item.activeIcon : item.icon,
+            height: 24.adaptSize,
+            width: 24.adaptSize,
+            color: iconColor,
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 2.v),
+            child: Text(
+              item.title ?? "",
+              style: isActive
+                  ? CustomTextStyles.labelLargeOnPrimaryContainer.copyWith(color: iconColor)
+                  : theme.textTheme.labelLarge!.copyWith(color: iconColor),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
 }
 // ignore_for_file: must_be_immutable
 
@@ -147,7 +141,7 @@ class DefaultWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Please replace the respective Widget here',
+              '',
               style: TextStyle(
                 fontSize: 18,
               ),

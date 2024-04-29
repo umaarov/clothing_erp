@@ -1,14 +1,17 @@
+import 'dart:convert';
+
+import 'package:clothing_erp/presentation/orders_tab_container_screen/orders_tab_container_screen.dart';
 import 'package:clothing_erp/presentation/statistic_container_screen/statistic_container_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/app_export.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_text_form_field.dart';
 
 class SignInScreen extends StatefulWidget {
-  SignInScreen({Key? key})
-      : super(
-          key: key,
-        );
+  SignInScreen({Key? key}) : super(key: key);
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
@@ -16,9 +19,7 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   TextEditingController emailController = TextEditingController();
-
-  TextEditingController passwordoneController = TextEditingController();
-
+  TextEditingController passwordController = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -57,13 +58,9 @@ class _SignInScreenState extends State<SignInScreen> {
                       text: "Sign In",
                       buttonTextStyle:
                           CustomTextStyles.titleMediumPoppinsGray50,
-                      onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  StatisticContainerScreen())),
+                      onPressed: _signIn,
                     ),
-                    SizedBox(height: 5.v)
+                    SizedBox(height: 5.v),
                   ],
                 ),
               ),
@@ -74,7 +71,6 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  /// Section Widget
   Widget _buildEmailField(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +89,6 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  /// Section Widget
   Widget _buildPasswordField(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,32 +99,103 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
         SizedBox(height: 8.v),
         CustomTextFormField(
-          controller: passwordoneController,
+          controller: passwordController,
           hintText: "Parol",
           textInputAction: TextInputAction.done,
           textInputType: TextInputType.visiblePassword,
-          suffix: Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: 30.h,
-              vertical: 14.v,
-            ),
-            child: CustomImageView(
-              imagePath: ImageConstant.imgHide,
-              height: 24.adaptSize,
-              width: 24.adaptSize,
-            ),
-          ),
-          suffixConstraints: BoxConstraints(
-            maxHeight: 52.v,
-          ),
           obscureText: true,
-          contentPadding: EdgeInsets.only(
-            left: 16.h,
-            top: 18.v,
-            bottom: 18.v,
-          ),
         )
       ],
     );
+  }
+
+  void _signIn() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      return;
+    }
+
+    try {
+      final response = await http
+          .get(Uri.parse('https://jsonplaceholder.typicode.com/users'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> responseData = jsonDecode(response.body);
+
+        final user = responseData.firstWhere((user) => user['email'] == email,
+            orElse: () => null);
+
+        if (user != null) {
+          if (password == user['id'].toString()) {
+            final prefs = await SharedPreferences.getInstance();
+            prefs.setInt('userId', user['id']);
+            prefs.setString('userName', user['name']);
+            prefs.setString('userEmail', user['email']);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => StatisticContainerScreen(),
+              ),
+            );
+            return;
+          }
+        } else if (email == 'manager@gmail.com' && password == '1234') {
+          // Navigate to OrdersPage
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrdersTabContainerScreen(),
+            ),
+          );
+          return;
+        }
+
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Incorrect email or password.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to sign in. Please try again later.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error: $e');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content:
+              Text('An unexpected error occurred. Please try again later.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

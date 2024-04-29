@@ -8,12 +8,17 @@ dependencies:
     sdk: flutter
   flutter_localizations: 
     sdk: flutter
-  cached_network_image: ^3.3.0
-  flutter_svg: ^2.0.9
+  cached_network_image: ^3.3.1
+  flutter_svg: ^2.0.10+1
   flutter_svg_provider: ^1.0.7
   dotted_border: ^2.1.0
-  intl: ^0.18.0
-  connectivity_plus: ^5.0.2
+  intl: ^0.18.1
+  connectivity_plus: ^6.0.3
+  fluttertoast: ^8.2.5
+  http: ^1.2.1
+  shared_preferences: ^2.2.3
+  flutter_charts: ^0.5.2
+  flutter_dropzone: ^4.0.0
 dev_dependencies: 
   flutter_test: 
     sdk: flutter

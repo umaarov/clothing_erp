@@ -1,4 +1,6 @@
+import 'package:clothing_erp/presentation/create_product_screen/create_product_screen.dart';
 import 'package:flutter/material.dart';
+
 import '../../core/app_export.dart';
 import '../../theme/custom_button_style.dart';
 import '../../widgets/custom_elevated_button.dart';
@@ -16,6 +18,7 @@ class CheckPage extends StatefulWidget {
   @override
   CheckPageState createState() => CheckPageState();
 }
+
 class CheckPageState extends State<CheckPage>
     with AutomaticKeepAliveClientMixin<CheckPage> {
   TextEditingController searchController = TextEditingController();
@@ -41,6 +44,7 @@ class CheckPageState extends State<CheckPage>
 
   @override
   bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -86,6 +90,14 @@ class CheckPageState extends State<CheckPage>
     return CustomElevatedButton(
       height: 52.v,
       text: "Mahsulot qo’shish",
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CreateProductScreen(),
+          ),
+        );
+      },
     );
   }
 
